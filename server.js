@@ -1,21 +1,24 @@
-/**
- * Created by hanifa on 4/19/17.
- */
 var express = require('express');
-var bodyparser = require('body-parser');
-var path = require('path');
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
 
 var app = express();
-app.use(bodyparser.urlencoded({ extended: false }));
-app.use(bodyparser.json());
-app.use(express.static(path.join(__dirname, "public")));
 
-app.get('/', function (req, res){
-    console.log(" we are here to learn");
-    res.sendFile(path.join(__dirname,'./app/public/index.html'));
-});
+app.use(express.static(process.cwd() + '/public'));
 
-app.listen(3000, function (err) {
-    if(err) return console.log("Server couldn't be established 'FAILED' ");
-    console.log(" Server is succcessfully up and runing ");
-})
+app.use(bodyParser.urlencoded({
+	extended: false
+}));
+
+app.use(methodOverride('_method'));
+var exphbs = require('express-handlebars');
+app.engine('handlebars', exphbs({
+	defaultLayout: 'main'
+}));
+app.set('view engine', 'handlebars');
+
+var routes = require('./controllers/burgers_controller.js');
+app.use('/', routes);
+
+var PORT = process.env.PORT || 3000;
+app.listen(PORT);
